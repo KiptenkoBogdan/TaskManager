@@ -1,10 +1,12 @@
 package ua.edu.sumdu.j2se.kiptenko.tasks.model;
 
+import org.apache.log4j.Logger;
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.stream.Stream;
 
 public class LinkedTaskList extends AbstractTaskList{
+    private static final Logger logger = Logger.getLogger(LinkedTaskList.class);
     private Node first;
     private Node last;
     private int size;
@@ -17,6 +19,7 @@ public class LinkedTaskList extends AbstractTaskList{
 
     public void add(Task task) throws IllegalArgumentException{
         if (task == null) {
+            logger.error("Task is empty");
             throw new IllegalArgumentException("Task can`t` be empty!");
         }
 
@@ -65,6 +68,7 @@ public class LinkedTaskList extends AbstractTaskList{
 
     public Task getTask(int index) {
         if (index < 0 || index >= size) {
+            logger.error("Entered wrong index");
             throw new IndexOutOfBoundsException("Incorrect index of element");
         } else {
             Node element = first;
