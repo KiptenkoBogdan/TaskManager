@@ -1,10 +1,11 @@
 package ua.edu.sumdu.j2se.kiptenko.tasks.model;
 
+import org.apache.log4j.Logger;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Task {
-
+    private static final Logger logger = Logger.getLogger(Task.class);
     private String title;
     private LocalDateTime time;
     private LocalDateTime start;
@@ -14,31 +15,46 @@ public class Task {
     private boolean repeated;
 
     public Task (String title, LocalDateTime time) {
-        this.title = title;
-        this.interval = 0;
-        if(time == null)
-            throw new IllegalArgumentException("Time can not be negative");
+        if(title == null){
+            logger.error("Title is empty.");
+            throw new IllegalArgumentException("Title can not be empty");
+        }else{
+            this.title = title;
+        }
+        if(time == null){
+            logger.error("Time is empty.");
+            throw new IllegalArgumentException("Time can not be empty or negative");
+        }
         else{
             this.time = time;
             this.start = time;
             this.end = time;
         }
-
+        this.interval = 0;
     }
 
     public Task(String title, LocalDateTime start, LocalDateTime end, int interval) {
-        this.title = title;
-        this.interval = interval;
         this.repeated = true;
-        if(start == null || end == null)
-            throw new IllegalArgumentException("Time can not be negative");
+
+        if(title == null){
+            logger.error("Title is empty.");
+            throw new IllegalArgumentException("Title can not be empty");
+        }else{
+            this.title = title;
+        }
+        if(start == null || end == null){
+            logger.error("Start and End time is empty or negative.");
+            throw new IllegalArgumentException("Time can not be empty or negative");
+        }
         else{
             this.time = start;
             this.start = start;
             this.end = end;
         }
-        if(interval <= 0)
+        if(interval <= 0){
+            logger.error("Interval is empty or negative.");
             throw new IllegalArgumentException("Interval can not be negative");
+        }
         else{
             this.interval = interval;
         }

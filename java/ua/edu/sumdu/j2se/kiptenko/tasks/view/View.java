@@ -6,6 +6,7 @@ import ua.edu.sumdu.j2se.kiptenko.tasks.model.Tasks;
 import ua.edu.sumdu.j2se.kiptenko.tasks.util.TaskTable;
 import ua.edu.sumdu.j2se.kiptenko.tasks.util.TimeConverter;
 
+import org.apache.log4j.Logger;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -15,6 +16,7 @@ import java.util.Set;
 import java.util.SortedMap;
 
 public class View {
+    private static final Logger logger = Logger.getLogger(View.class);
     private Scanner scanner = new Scanner(System.in);
 
     public View() {
@@ -114,6 +116,7 @@ public class View {
                 break;
             } else {
                 print("Wrong parameters! Enter the correct time period for the calendar!");
+                logger.error("Entered incorrect time period");
             }
         }
     }
@@ -124,8 +127,8 @@ public class View {
         while (title.isEmpty()) {
             title = scanner.nextLine();
             if (title.isEmpty()) {
-                print("Task name2" +
-                        " is empty. Please enter correct value: ");
+                print("Title is empty. Please enter task title: ");
+                logger.error("Entered incorrect task title");
             }
         }
         return title;
@@ -140,6 +143,7 @@ public class View {
                 print("Activity status is empty. Please enter correct value: ");
             } else if (!(s.equalsIgnoreCase("true") || s.equalsIgnoreCase("false"))) {
                 print("Incorrect status. Please enter correct value: ");
+                logger.error("Entered incorrect status");
             }
         }
         return Boolean.parseBoolean(s);
@@ -180,6 +184,7 @@ public class View {
                 break;
             } catch (DateTimeParseException e) {
                 print("Incorrect! Please enter the date of the following time: dd-MM-yyyy HH:mm: ");
+                logger.error("Entered incorrect date format");
             }
         }
         return time;
@@ -253,6 +258,7 @@ public class View {
                 return n;
             }
             print("Please, enter correct value or [quit] to cancel: ");
+            logger.error("Entered incorrect value");
         }
     }
 }

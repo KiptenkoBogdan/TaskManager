@@ -1,13 +1,25 @@
 package ua.edu.sumdu.j2se.kiptenko.tasks.controller;
 
+import ua.edu.sumdu.j2se.kiptenko.tasks.Main;
 import ua.edu.sumdu.j2se.kiptenko.tasks.model.AbstractTaskList;
+import ua.edu.sumdu.j2se.kiptenko.tasks.model.Tasks;
 import ua.edu.sumdu.j2se.kiptenko.tasks.view.View;
 import ua.edu.sumdu.j2se.kiptenko.tasks.model.Task;
+import ua.edu.sumdu.j2se.kiptenko.tasks.model.TaskIO;
 
+import org.apache.log4j.Logger;
+
+import java.awt.*;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
+import java.util.SortedMap;
 
-public class Controller {
+public class Controller extends Thread{
+    private static final Logger logger = Logger.getLogger(Controller.class);
+    private final static long TIMER = 300000; // 5 MIN
     private AbstractTaskList model;
     private View view;
     private Scanner scanner;
@@ -18,7 +30,7 @@ public class Controller {
         scanner = new Scanner(System.in);
     }
 
-    public void execute() {
+    public void execute(){
         while (true) {
             view.showMenu();
             String line = scanner.nextLine();
@@ -92,7 +104,9 @@ public class Controller {
             model.add(task);
             view.displayTaskInfo(task);
             view.print("The task was successfully added to the list.");
+            logger.info("The task: " + task.getTitle() + " was successfully added to the list.");
         }
+        TaskIO.saveToFile(model, Main.SAVE_FILE);
     }
 
     public void editTask() {
@@ -152,9 +166,11 @@ public class Controller {
                         break;
                     default:
                 }
+                TaskIO.saveToFile(model, Main.SAVE_FILE);
             }
         }
         view.println("The task has been successfully changed!");
+        logger.info("The task: " + task.getTitle() + "has been successfully changed!");
     }
 
     public void removeTask() {
@@ -168,10 +184,72 @@ public class Controller {
             task = model.getTask(taskID - 1);
             model.remove(task);
             view.print("Task №: " + taskID + " was deleted!");
+            logger.info("Task №: " + taskID + " was deleted!");
+            TaskIO.saveToFile(model, Main.SAVE_FILE);
         }
     }
 
     public void getCalendar() {
         view.getCalendar(model);
+    }
+
+    // system tray notification popup
+//    public void getNotification() throws AWTException {
+//        if (SystemTray.isSupported()) {
+//            SystemTray tray = SystemTray.getSystemTray();
+//
+//            java.awt.Image image = Toolkit.getDefaultToolkit().getImage("images/tray.gif");
+//            TrayIcon trayIcon = new TrayIcon(image);
+//            tray.add(trayIcon);
+//            trayIcon.displayMessage("Test.", "This is a message to test notifications in Windows 10",
+//                    TrayIcon.MessageType.INFO);
+//        }
+//    }
+//    public void displayTray() throws AWTException {
+//        //Obtain only one instance of the SystemTray object
+//        SystemTray tray = SystemTray.getSystemTray();
+//
+//        //If the icon is a file
+//        Image image = Toolkit.getDefaultToolkit().createImage("icon.png");
+//        //Alternative (if the icon is on the classpath):
+//        //Image image = Toolkit.getDefaultToolkit().createImage(getClass().getResource("icon.png"));
+//
+//        TrayIcon trayIcon = new TrayIcon(image, "Tray Demo");
+//        //Let the system resize the image if needed
+//        trayIcon.setImageAutoSize(true);
+//        //Set tooltip text for the tray icon
+//        trayIcon.setToolTip("System tray icon demo");
+//        tray.add(trayIcon);
+//
+//        trayIcon.displayMessage("Hello, World", "notification demo", TrayIcon.MessageType.INFO);
+//    }
+    @Override
+    public void run() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+        SortedMap<LocalDateTime, Set<Task>> map;
+        while (true) {
+            map = Tasks.calendar(model, LocalDateTime.now(), LocalDateTime.now().plusHours(1));
+            System.out.println("\n----------------------------");
+            System.out.println("\tNOTIFICATION: ");
+            System.out.println("----------------------------");
+            if (map.isEmpty()) {
+                logger.info("Calendar has no tasks for the next hour");
+            } else {
+                System.out.println("Tasks for the upcoming hour: ");
+                for (Map.Entry<LocalDateTime, Set<Task>> entry : map.entrySet()) {
+                    String date = entry.getKey().format(formatter);
+                    System.out.println("Date: " + date);
+                    for (Task task : entry.getValue()) {
+                        System.out.println("\tTask: " + task.getTitle());
+                    }
+                }
+            }
+            try {
+                Thread.sleep(TIMER);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                logger.error("Interrupted exception.", e);
+            }
+        }
     }
 }

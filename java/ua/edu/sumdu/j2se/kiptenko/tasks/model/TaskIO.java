@@ -1,12 +1,16 @@
 package ua.edu.sumdu.j2se.kiptenko.tasks.model;
 
 import com.google.gson.Gson;
-
+import org.apache.log4j.Logger;
 import java.io.*;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
 public class TaskIO {
+    private static final Logger logger = Logger.getLogger(TaskIO.class);
+    
     public static void write(AbstractTaskList tasks, OutputStream out) throws IOException {
         try (DataOutputStream stream = new DataOutputStream(new BufferedOutputStream(out))) {
             stream.writeInt(tasks.size());
@@ -107,6 +111,24 @@ public class TaskIO {
             }
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+    public static void saveToFile(AbstractTaskList list, String path) {
+        Path currentPath = FileSystems.getDefault().getPath(path).toAbsolutePath();
+        if (currentPath.toFile().exists()) {
+            TaskIO.writeText(list, new File(String.valueOf(currentPath.toFile())));
+            logger.info("List of tasks is saved to file: " + path);
+        } else {
+            logger.error("File: " + path + " not found");
+        }
+    }
+    public static void loadFromFile(AbstractTaskList list, String path) {
+        Path currentPath = FileSystems.getDefault().getPath(path).toAbsolutePath();
+        if (currentPath.toFile().exists()) {
+            TaskIO.readText(list, new File(String.valueOf(currentPath.toFile())));
+            logger.info("List of tasks is loaded from file: " + path);
+        } else {
+            logger.error("File: " + path + " not found");
         }
     }
 }

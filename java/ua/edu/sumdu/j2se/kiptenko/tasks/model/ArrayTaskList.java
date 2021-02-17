@@ -1,14 +1,15 @@
 package ua.edu.sumdu.j2se.kiptenko.tasks.model;
 
+import org.apache.log4j.Logger;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.stream.Stream;
 
 public class ArrayTaskList extends AbstractTaskList{
+    private static final Logger logger = Logger.getLogger(ArrayTaskList.class);
     private Task[] array;
     private int size;
-    private Object IndexOutOfBoundsException;
 
     public ArrayTaskList(){
         array = new Task[10];
@@ -17,9 +18,9 @@ public class ArrayTaskList extends AbstractTaskList{
 
     public void add(Task task) throws IllegalArgumentException{
         if (task == null) {
+            logger.error("Task is empty");
             throw new IllegalArgumentException("Task can`t` be empty!");
         }
-
         if (size < array.length) {
             array[size++] = task;
         } else {
@@ -56,6 +57,7 @@ public class ArrayTaskList extends AbstractTaskList{
 
     public Task getTask (int index) throws IndexOutOfBoundsException{
         if(index < 0 || index >= array.length){
+            logger.error("Entered wrong index");
             throw new IndexOutOfBoundsException("Index out of bounds");
         } else{
             return array[index];
@@ -121,7 +123,7 @@ public class ArrayTaskList extends AbstractTaskList{
     @Override
     public Iterator<Task> iterator(){
         Iterator<Task> iterator = new Iterator<Task>() {
-            private int lastRet = -1; // index of last element returned; -1 if no such
+            private int lastRet = -1; // index of last element returned; -1 if no such element found
             private int currentIndex = 0;
 
             @Override
