@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.SortedMap;
 
 public class View {
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
     private static final Logger logger = Logger.getLogger(View.class);
     private Scanner scanner = new Scanner(System.in);
 
@@ -91,7 +92,6 @@ public class View {
     }
 
     public void getCalendar(AbstractTaskList list) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
         while (true) {
             print("Enter start date of the period: ");
             LocalDateTime start = parseDateTime();
@@ -173,7 +173,6 @@ public class View {
     }
 
     public LocalDateTime parseDateTime() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
         String date = "";
         LocalDateTime time;
         print("Enter the date in the following format: dd-MM-yyyy HH:mm: ");
@@ -191,7 +190,6 @@ public class View {
     }
 
     public void displayTaskInfo(Task task) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
         StringBuilder builder = new StringBuilder();
         builder.append("Task title: " + task.getTitle());
         if (!task.isRepeated()) {
@@ -215,7 +213,6 @@ public class View {
     }
 
     private void notEmptyList(AbstractTaskList tasks) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
         TaskTable st = new TaskTable();
         st.setShowVerticalLines(true);
         st.setHeaders("№", "Title", "Start time", "End time", "Interval", "Status");
