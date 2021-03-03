@@ -37,9 +37,7 @@ public class ArrayTaskList extends AbstractTaskList{
         } else {
             for(int i = 0; i < size; i++){
                 if(task.equals(array[i])){
-                    for(int j = i; j < size; j++){
-                        array[j] = array[j+1];
-                    }
+                    System.arraycopy(array, i + 1, array, i, size - i);
                     Task[] tempArray = new Task[array.length -1];
                     System.arraycopy(array, 0, tempArray, 0, tempArray.length);
                     array = tempArray;
