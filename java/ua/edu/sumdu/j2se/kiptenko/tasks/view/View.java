@@ -191,15 +191,15 @@ public class View {
 
     public void displayTaskInfo(Task task) {
         StringBuilder builder = new StringBuilder();
-        builder.append("Task title: " + task.getTitle());
+        builder.append("Task title: ").append(task.getTitle());
         if (!task.isRepeated()) {
-            builder.append(", time: " + task.getTime().format(formatter));
+            builder.append(", time: ").append(task.getTime().format(formatter));
         } else {
-            builder.append(", start time: " + task.getStartTime().format(formatter)
-                    + ", end time: " + task.getEndTime().format(formatter))
-                    .append(", interval: " + TimeConverter.SecondsToDays(task.getRepeatInterval()));
+            builder.append(", start time: ").append(task.getStartTime().format(formatter))
+                    .append(", end time: ").append(task.getEndTime().format(formatter))
+                    .append(", interval: ").append(TimeConverter.SecondsToDays(task.getRepeatInterval()));
         }
-        builder.append(", active: " + task.isActive() + ".");
+        builder.append(", active: ").append(task.isActive()).append(".");
         println(builder.toString());
     }
 
