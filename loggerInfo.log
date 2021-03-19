@@ -1,0 +1,6 @@
+2021-03-19 13:11:08 INFO  TaskIO:130 - List of tasks is loaded from file: data.json
+2021-03-19 13:11:08 INFO  Controller:235 - Calendar has no tasks for the next hour
+2021-03-19 13:11:37 INFO  TaskIO:121 - List of tasks is saved to file: data.json
+2021-03-19 13:11:37 INFO  Main:25 - Closing program
+2021-03-19 13:13:34 INFO  TaskIO:129 - List of tasks is loaded from file: data.json
+2021-03-19 13:13:34 INFO  Controller:234 - Calendar has no tasks for the next hour
