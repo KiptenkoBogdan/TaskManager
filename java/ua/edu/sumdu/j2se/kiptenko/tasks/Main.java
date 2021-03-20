@@ -3,6 +3,7 @@ package ua.edu.sumdu.j2se.kiptenko.tasks;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import ua.edu.sumdu.j2se.kiptenko.tasks.controller.Controller;
+import ua.edu.sumdu.j2se.kiptenko.tasks.controller.Notification;
 import ua.edu.sumdu.j2se.kiptenko.tasks.model.*;
 import ua.edu.sumdu.j2se.kiptenko.tasks.view.View;
 
@@ -18,8 +19,11 @@ public class Main {
         TaskIO.loadFromFile(list, SAVE_FILE);
 		View view = new View();
 		Controller controller = new Controller(list, view);
-        Thread thread = new Thread(controller);
-        thread.start();
+        Notification notification = new Notification(controller);
+        notification.start();
+//        Thread thread = new Thread(controller);
+//        thread.setDaemon(true);
+//        thread.start();
 		controller.execute();
         TaskIO.saveToFile(list, SAVE_FILE);
         logger.info("Closing program");

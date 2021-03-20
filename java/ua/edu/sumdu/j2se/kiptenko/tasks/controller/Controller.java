@@ -5,15 +5,10 @@ import ua.edu.sumdu.j2se.kiptenko.tasks.Main;
 import ua.edu.sumdu.j2se.kiptenko.tasks.model.AbstractTaskList;
 import ua.edu.sumdu.j2se.kiptenko.tasks.model.Task;
 import ua.edu.sumdu.j2se.kiptenko.tasks.model.TaskIO;
-import ua.edu.sumdu.j2se.kiptenko.tasks.model.Tasks;
-import ua.edu.sumdu.j2se.kiptenko.tasks.util.TimeConverter;
 import ua.edu.sumdu.j2se.kiptenko.tasks.view.View;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
 
 public class Controller extends Thread{
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
@@ -25,6 +20,13 @@ public class Controller extends Thread{
     public Controller(AbstractTaskList list, View view) {
         model = list;
         this.view = view;
+    }
+    public AbstractTaskList getModel(){
+        return this.model;
+    }
+
+    public View getView(){
+        return this.view;
     }
 
     public void execute(){
@@ -247,51 +249,5 @@ public class Controller extends Thread{
             }
         }
         return null;
-    }
-
-    @Override
-    public void run() {
-        String nextTaskTime = checkNextTime(model);
-        view.println("\n----------------------------");
-        view.println("\tNOTIFICATION: ");
-        view.println("----------------------------");
-
-        if(nextTaskTime == null){
-            view.println("You have no active tasks at the moment");
-        } else{
-            view.println("You have an acive task set on: " + nextTaskTime);
-        }
-        try {
-                Thread.sleep(TIMER);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                logger.error("Interrupted exception.", e);
-            }
-//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
-//        SortedMap<LocalDateTime, Set<Task>> map;
-//        while (true) {
-//            map = Tasks.calendar(model, LocalDateTime.now(), LocalDateTime.now().plusHours(1));
-//            view.println("\n----------------------------");
-//            view.println("\tNOTIFICATION: ");
-//            view.println("----------------------------");
-//            if (map.isEmpty()) {
-//                logger.info("Calendar has no tasks for the next hour");
-//            } else {
-//                view.println("Tasks for the upcoming hour: ");
-//                for (Map.Entry<LocalDateTime, Set<Task>> entry : map.entrySet()) {
-//                    String date = entry.getKey().format(formatter);
-//                    view.println("Date: " + date);
-//                    for (Task task : entry.getValue()) {
-//                        view.println("\tTask: " + task.getTitle());
-//                    }
-//                }
-//            }
-//            try {
-//                Thread.sleep(TIMER);
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//                logger.error("Interrupted exception.", e);
-//            }
-//        }
     }
 }
