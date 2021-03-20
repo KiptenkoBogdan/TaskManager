@@ -36,7 +36,7 @@ public class TaskIO {
                 }
             }
         } catch (IOException e) {
-            logger.error("IOException has occured while writing to stream");
+            logger.error(e);
         }
         finally {
             out.flush();
@@ -70,7 +70,7 @@ public class TaskIO {
                 task.setActive(active);
             }
         } catch (IOException e) {
-            logger.error("IOException has occured while reading from stream");
+            logger.error(e);
         }
         finally {
             in.close();
@@ -81,14 +81,14 @@ public class TaskIO {
             write(tasks, stream);
             stream.flush();
         } catch (IOException e) {
-            logger.error("IOException has occured while writing binary stream to file" + file);
+            logger.error(e);
         }
     }
     public static void readBinary(AbstractTaskList tasks, File file) {
         try (BufferedInputStream stream = new BufferedInputStream(new FileInputStream(file))) {
             read(tasks, stream);
         } catch (IOException e) {
-            logger.error("IOException has occured while reading binary stream in file" + file);
+            logger.error(e);
         }
     }
     public static void writeText(AbstractTaskList tasks, File file) {
@@ -97,7 +97,7 @@ public class TaskIO {
             writer.write(json);
             writer.flush();
         } catch (IOException e) {
-            logger.error("IOException has occured while writing to file" + file);
+            logger.error(e);
         }
     }
     public static void readText(AbstractTaskList tasks, File file) {
@@ -110,7 +110,7 @@ public class TaskIO {
                 }
             }
         } catch (IOException e) {
-            logger.error("IOException has occured while reading file" + file);
+            logger.error(e);
         }
     }
     public static void saveToFile(AbstractTaskList list, String path) {

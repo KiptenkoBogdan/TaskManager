@@ -1,19 +1,16 @@
 package ua.edu.sumdu.j2se.kiptenko.tasks.controller;
 
+import org.apache.log4j.Logger;
 import ua.edu.sumdu.j2se.kiptenko.tasks.Main;
 import ua.edu.sumdu.j2se.kiptenko.tasks.model.AbstractTaskList;
-import ua.edu.sumdu.j2se.kiptenko.tasks.model.Tasks;
-import ua.edu.sumdu.j2se.kiptenko.tasks.view.View;
 import ua.edu.sumdu.j2se.kiptenko.tasks.model.Task;
 import ua.edu.sumdu.j2se.kiptenko.tasks.model.TaskIO;
+import ua.edu.sumdu.j2se.kiptenko.tasks.model.Tasks;
+import ua.edu.sumdu.j2se.kiptenko.tasks.view.View;
 
-import org.apache.log4j.Logger;
-
-import java.awt.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.Set;
 import java.util.SortedMap;
 
@@ -22,18 +19,16 @@ public class Controller extends Thread{
     private final static long TIMER = 300000; // 5 MIN
     private AbstractTaskList model;
     private View view;
-    private Scanner scanner;
 
     public Controller(AbstractTaskList list, View view) {
         model = list;
         this.view = view;
-        scanner = new Scanner(System.in);
     }
 
     public void execute(){
         while (true) {
             view.showMenu();
-            String line = scanner.nextLine();
+            String line = view.getOption();
             int choice;
             try {
                 choice = Integer.parseInt(line);
@@ -115,7 +110,7 @@ public class Controller extends Thread{
         LocalDateTime start, end;
         while (true) {
             view.showEditMenu();
-            String line = scanner.nextLine();
+            String line = view.getOption();
             int choice;
             try {
                 choice = Integer.parseInt(line);

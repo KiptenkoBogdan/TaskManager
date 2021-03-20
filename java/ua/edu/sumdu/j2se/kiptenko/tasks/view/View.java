@@ -54,6 +54,10 @@ public class View {
         print("Enter your choice: ");
     }
 
+    public String getOption(){
+        return scanner.nextLine();
+    }
+
     public void showTaskList(AbstractTaskList tasks) {
         if (tasks.size() == 0) {
             emptyList();
