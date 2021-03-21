@@ -9,18 +9,27 @@ import ua.edu.sumdu.j2se.kiptenko.tasks.view.View;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Consumer;
 
-public class Controller extends Thread{
+public class Controller{
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
     private static final Logger logger = Logger.getLogger(Controller.class);
     private final static long TIMER = 300000; // 5 MIN
     private AbstractTaskList model;
     private View view;
+    Map<Integer, Runnable> menuAction = new HashMap<>();
+    Map<Integer, Consumer<Task>> editAction  = new HashMap<>();
 
     public Controller(AbstractTaskList list, View view) {
         model = list;
         this.view = view;
+        actionMenuInit();
     }
+
     public AbstractTaskList getModel(){
         return this.model;
     }
@@ -29,7 +38,11 @@ public class Controller extends Thread{
         return this.view;
     }
 
-    public void execute(){
+    public void getList() {
+        view.showTaskList(model);
+    }
+
+    public void execute() {
         updateTaskStatus(model);
         while (true) {
             view.showMenu();
@@ -47,30 +60,14 @@ public class Controller extends Thread{
                     break;
                 }
             } else {
-                switch (choice) {
-                    case 1:
-                        getList();
-                        break;
-                    case 2:
-                        addTask();
-                        break;
-                    case 3:
-                        editTask();
-                        break;
-                    case 4:
-                        removeTask();
-                        break;
-                    case 5:
-                        getCalendar();
-                        break;
-                    default:
+                Runnable action = menuAction.get(choice);
+                if (action != null) {
+                    action.run();
+                } else {
+                    view.println("Choose existing option (0-5)");
                 }
             }
         }
-    }
-
-    public void getList() {
-        view.showTaskList(model);
     }
 
     public void addTask() {
@@ -113,6 +110,7 @@ public class Controller extends Thread{
         int index = view.selectTask(model) - 1;
         Task task = model.getTask(index);
         LocalDateTime start, end;
+        actionEditTaskInit();
         while (true) {
             view.showEditMenu();
             String line = view.getOption();
@@ -128,49 +126,86 @@ public class Controller extends Thread{
                 if (view.checkUserAnswer()) {
                     break;
                 }
-            } else {
-                switch (choice) {
-                    case 1:
-                        task.setTitle(view.getTitle());
-                        view.print("Title was changed to: " + task.getTitle());
-                        break;
-                    case 2:
-                        boolean aBoolean = view.getActiveStatus();
-                        task.setActive(aBoolean);
-                        view.print("Activity status was changed to: " + task.isActive());
-                        break;
-                    case 3:
-                        task.setTime(view.parseDateTime());
-                        view.print("Time was changed to: " + task.getTime());
-                        break;
-                    case 4:
-                        while (true) {
-                            view.print("Enter start time: ");
-                            start = view.parseDateTime();
-                            view.print("Enter end time: ");
-                            end = view.parseDateTime();
-                            view.print("Enter interval time: ");
-                            int interval = view.getInterval();
-
-                            if (!((start.isAfter(end) || start.isEqual(end)) &&
-                                    start.plusSeconds(interval).isAfter(end))) {
-                                task.setTime(start, end, interval);
-                                view.print("Start time was changed to: " + task.getStartTime() +
-                                        "\nEnd time was changed to: " + task.getEndTime() +
-                                        "\nInterval was changed to: " + task.getRepeatInterval());
-                                break;
-                            } else {
-                                view.println("Wrong time period. Please try again.");
-                            }
-                        }
-                        break;
-                    default:
+            } else{
+                Consumer<Task> action = editAction.get(choice);
+                if (action != null) {
+                    action.accept(task);
+                } else{
+                    view.println("Choose existing option (0-5)");
                 }
-                TaskIO.saveToFile(model, Main.SAVE_FILE);
             }
         }
         view.println("The task has been successfully changed!");
         logger.info("The task: " + task.getTitle() + "has been successfully changed!");
+    }
+
+    public void editTitle(Task task){
+        task.setTitle(view.getTitle());
+        view.print("Title was changed to: " + task.getTitle());
+    }
+    public void editStatus(Task task){
+        boolean aBoolean = view.getActiveStatus();
+        task.setActive(aBoolean);
+        view.print("Activity status was changed to: " + task.isActive());
+    }
+    public void editTime(Task task){
+        task.setTime(view.parseDateTime());
+        view.print("Time was changed to: " + task.getTime());
+    }
+    public void editRepeatableTime(Task task){
+        LocalDateTime start, end;
+        while (true) {
+            view.print("Enter start time: ");
+            start = view.parseDateTime();
+            view.print("Enter end time: ");
+            end = view.parseDateTime();
+            view.print("Enter interval time: ");
+            int interval = view.getInterval();
+
+            if (!((start.isAfter(end) || start.isEqual(end)) &&
+                    start.plusSeconds(interval).isAfter(end))) {
+                task.setTime(start, end, interval);
+                view.print("Start time was changed to: " + task.getStartTime() +
+                        "\nEnd time was changed to: " + task.getEndTime() +
+                        "\nInterval was changed to: " + task.getRepeatInterval());
+                break;
+            } else {
+                view.println("Wrong time period. Please try again.");
+            }
+        }
+    }
+
+    private void actionMenuInit(){
+        menuAction.put(1, () -> {
+            getList();
+        });
+        menuAction.put(2,() -> {
+            addTask();
+        });
+        menuAction.put(3,() -> {
+            editTask();
+        });
+        menuAction.put(4,() -> {
+            removeTask();
+        });
+        menuAction.put(5,() -> {
+            getCalendar();
+        });
+    }
+
+    public void actionEditTaskInit(){
+        editAction.put(1, (t) -> {
+            editTitle(t);
+        });
+        editAction.put(2, (t) -> {
+            editStatus(t);
+        });
+        editAction.put(3, (t) -> {
+            editTime(t);
+        });
+        editAction.put(4, (t) -> {
+            editRepeatableTime(t);
+        });
     }
 
     public void removeTask() {
@@ -192,37 +227,6 @@ public class Controller extends Thread{
     public void getCalendar() {
         view.getCalendar(model);
     }
-
-    // system tray notification popup
-//    public void getNotification() throws AWTException {
-//        if (SystemTray.isSupported()) {
-//            SystemTray tray = SystemTray.getSystemTray();
-//
-//            java.awt.Image image = Toolkit.getDefaultToolkit().getImage("images/tray.gif");
-//            TrayIcon trayIcon = new TrayIcon(image);
-//            tray.add(trayIcon);
-//            trayIcon.displayMessage("Test.", "This is a message to test notifications in Windows 10",
-//                    TrayIcon.MessageType.INFO);
-//        }
-//    }
-//    public void displayTray() throws AWTException {
-//        //Obtain only one instance of the SystemTray object
-//        SystemTray tray = SystemTray.getSystemTray();
-//
-//        //If the icon is a file
-//        Image image = Toolkit.getDefaultToolkit().createImage("icon.png");
-//        //Alternative (if the icon is on the classpath):
-//        //Image image = Toolkit.getDefaultToolkit().createImage(getClass().getResource("icon.png"));
-//
-//        TrayIcon trayIcon = new TrayIcon(image, "Tray Demo");
-//        //Let the system resize the image if needed
-//        trayIcon.setImageAutoSize(true);
-//        //Set tooltip text for the tray icon
-//        trayIcon.setToolTip("System tray icon demo");
-//        tray.add(trayIcon);
-//
-//        trayIcon.displayMessage("Hello, World", "notification demo", TrayIcon.MessageType.INFO);
-//    }
 
     public void updateTaskStatus(AbstractTaskList tasks){
         LocalDateTime currTime = LocalDateTime.now();
